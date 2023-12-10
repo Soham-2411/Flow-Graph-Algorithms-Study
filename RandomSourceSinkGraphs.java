@@ -1,6 +1,6 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Random;
 
@@ -12,6 +12,11 @@ class Edge {
         this.to = to;
         this.capacity = capacity;
     }
+
+    @Override
+    public String toString(){
+        return "Connected to: " + to + " with capacity: " + capacity;
+    }
 }
 
 class Node {
@@ -21,13 +26,14 @@ class Node {
 
     public Node(int id, double x, double y) {
         this.id = id;
-        this.x = x;
-        this.y = y;
+        DecimalFormat df = new DecimalFormat("0.00");
+        this.x = Double.parseDouble(df.format(x));
+        this.y = Double.parseDouble(df.format(y));
         this.edges = new LinkedList<>();
     }
 
     public void addEdge(Node node, int capacity) {
-        edges.add(new Edge(node.id, 0));
+        edges.add(new Edge(node.id, capacity));
     }
 
     public boolean containsEdgeWithNode(Node node) {
@@ -46,7 +52,7 @@ class Node {
 
     @Override
     public String toString() {
-        return "Node: " + id + ": " + x + "," + y;
+        return "Node: " + id + ": " + x + "," + y + edges;
     }
 }
 
@@ -54,22 +60,24 @@ class Node {
 public class RandomSourceSinkGraphs {
 
     ArrayList<ArrayList<Integer>> graphAdjacencyList;
+    Random randNum;
 
-    ArrayList<ArrayList<HashMap<Integer, Integer>>> graphAdjacencyListWithCapacities;
-
-    int sourceNode;
-    int sinkNode;
+    public RandomSourceSinkGraphs(){
+        randNum = new Random();
+        randNum.setSeed(123456789);
+    }
+    static int sourceNode;
+    static int sinkNode;
     ArrayList<Integer> distanceToEachNodeForSource = new ArrayList<>();
 
     private double calculateDistance(Node a, Node b) {
         return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
-    public void generateGraph(int n, double r, int upperCap, ArrayList<Node> nodes) {
-        Random rand = new Random();
+    public ArrayList<Node> generateGraph(int n, double r, int upperCap, ArrayList<Node> nodes) {
 
         for (int i = 0; i < n; i++) {
-            Node node = new Node(i, rand.nextDouble(1), rand.nextDouble(1));
+            Node node = new Node(i, randNum.nextDouble(1), randNum.nextDouble(1));
             //System.out.println(node.toString());
             nodes.add(node);
         }
@@ -82,15 +90,17 @@ public class RandomSourceSinkGraphs {
             for (int j = 0; j < n; j++) {
                 if (i != j && calculateDistance(nodes.get(i), nodes.get(j)) <= r) {
                     if (!nodes.get(i).containsEdgeWithNode(nodes.get(j))) {
-                        nodes.get(i).addEdge(nodes.get(j), rand.nextInt(upperCap));
+                        int capacity = randNum.nextInt(upperCap);
+                        nodes.get(i).addEdge(nodes.get(j), capacity);
                     }
                 }
             }
         }
-        generateAdjacencyList(nodes);
-        printGraph();
+        graphAdjacencyList = generateAdjacencyList(nodes);
+        printGraph(graphAdjacencyList);
         do {
-            sourceNode = rand.nextInt(n);
+            sourceNode = randNum.nextInt(n-1);
+            System.out.println("Generated : " + sourceNode);
         } while (graphAdjacencyList.get(sourceNode).size() <= 1);
         for (int i = 0; i < nodes.size(); i++) {
             distanceToEachNodeForSource.add(0);
@@ -106,6 +116,7 @@ public class RandomSourceSinkGraphs {
         sinkNode = distanceToEachNodeForSource.indexOf(maxValue);
         System.out.println("Source: " + sourceNode + " Sink: " + sinkNode);
         System.out.println(distanceToEachNodeForSource);
+        return nodes;
     }
 
     private void bfs(int source) {
@@ -131,39 +142,44 @@ public class RandomSourceSinkGraphs {
         }
     }
 
-    private void generateAdjacencyList(ArrayList<Node> nodes) {
-        graphAdjacencyList = new ArrayList<>();
-        graphAdjacencyListWithCapacities = new ArrayList<>();
+    public static ArrayList<ArrayList<Integer>> generateAdjacencyList(ArrayList<Node> nodes) {
+        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
         for (Node node : nodes) {
-            graphAdjacencyList.add(new ArrayList<>(List.of(node.id)));
-            graphAdjacencyListWithCapacities.add(new ArrayList<>());
+            graph.add(new ArrayList<>(List.of(node.id)));
             for (Edge edge : node.edges) {
-                graphAdjacencyListWithCapacities.get(node.id).add(new HashMap<>(1, 2));
-                graphAdjacencyList.get(node.id).add(edge.to);
+                graph.get(node.id).add(edge.to);
             }
         }
-
-        graphAdjacencyListWithCapacities = new ArrayList<>();
-//        graphAdjacencyList = new ArrayList<>(List.of(new ArrayList<>(List.of(0, 1, 2, 3)),
-//                new ArrayList<>(List.of(1, 4)),
-//                new ArrayList<>(List.of(2, 3)),
-//                new ArrayList<>(List.of(3, 4)),
-//                new ArrayList<>(List.of(4, 5)),
-//                new ArrayList<>(List.of(5, 2))));
+        return graph;
     }
 
-    private void printGraph() {
-        for (ArrayList<Integer> nodes : graphAdjacencyList) {
+
+    public static void printGraph(ArrayList<ArrayList<Integer>> graph) {
+        for (ArrayList<Integer> nodes : graph) {
             System.out.println(nodes);
         }
     }
 
-    public void writeIntoCSV() throws FileNotFoundException {
-        File csvFile = new File("Generated-Graphs.csv");
+    public static void writeIntoCSV(double r, int upperCap, ArrayList<Node> nodes, String fileName) throws FileNotFoundException {
+        File csvFile = new File(fileName);
         PrintWriter out = new PrintWriter(csvFile);
-        for(ArrayList<Integer> nodes: graphAdjacencyList){
-            out.println(nodes);
+        out.println("r = " + r + ",upperCap = " + upperCap);
+        out.println("NodeID,X,Y,EdgeTo,Capacity");
+        for (Node node : nodes) {
+            if(node.edges.isEmpty()){
+                out.printf("%d,%.2f,%.2f,-,-%n", node.id, node.x, node.y);
+            }
+
+
+            // Write the edges if they exist
+            for (Edge edge : node.edges) {
+                out.printf("%d,%.2f,%.2f,%d,%d%n", node.id, node.x, node.y, edge.to, edge.capacity);
+            }
         }
+        out.println("Source node:," + sourceNode);
+        out.println("Sink node:," + sinkNode);
         out.close();
     }
+
+
 }
