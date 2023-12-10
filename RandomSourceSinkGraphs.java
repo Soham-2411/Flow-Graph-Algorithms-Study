@@ -14,7 +14,7 @@ class Edge {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "Connected to: " + to + " with capacity: " + capacity;
     }
 }
@@ -62,10 +62,11 @@ public class RandomSourceSinkGraphs {
     ArrayList<ArrayList<Integer>> graphAdjacencyList;
     Random randNum;
 
-    public RandomSourceSinkGraphs(){
+    public RandomSourceSinkGraphs() {
         randNum = new Random();
         randNum.setSeed(123456789);
     }
+
     static int sourceNode;
     static int sinkNode;
     ArrayList<Integer> distanceToEachNodeForSource = new ArrayList<>();
@@ -90,7 +91,7 @@ public class RandomSourceSinkGraphs {
             for (int j = 0; j < n; j++) {
                 if (i != j && calculateDistance(nodes.get(i), nodes.get(j)) <= r) {
                     if (!nodes.get(i).containsEdgeWithNode(nodes.get(j))) {
-                        int capacity = randNum.nextInt(upperCap);
+                        int capacity = randNum.nextInt(upperCap+1);
                         nodes.get(i).addEdge(nodes.get(j), capacity);
                     }
                 }
@@ -99,7 +100,7 @@ public class RandomSourceSinkGraphs {
         graphAdjacencyList = generateAdjacencyList(nodes);
         printGraph(graphAdjacencyList);
         do {
-            sourceNode = randNum.nextInt(n-1);
+            sourceNode = randNum.nextInt(n - 1);
             System.out.println("Generated : " + sourceNode);
         } while (graphAdjacencyList.get(sourceNode).size() <= 1);
         for (int i = 0; i < nodes.size(); i++) {
@@ -108,8 +109,8 @@ public class RandomSourceSinkGraphs {
         System.out.println("RUNNING BFS");
         bfs(sourceNode);
         int maxValue = Integer.MIN_VALUE;
-        for(int dist : distanceToEachNodeForSource){
-            if(maxValue< dist && dist!=Integer.MAX_VALUE){
+        for (int dist : distanceToEachNodeForSource) {
+            if (maxValue < dist && dist != Integer.MAX_VALUE) {
                 maxValue = dist;
             }
         }
@@ -166,7 +167,7 @@ public class RandomSourceSinkGraphs {
         out.println("r = " + r + ",upperCap = " + upperCap);
         out.println("NodeID,X,Y,EdgeTo,Capacity");
         for (Node node : nodes) {
-            if(node.edges.isEmpty()){
+            if (node.edges.isEmpty()) {
                 out.printf("%d,%.2f,%.2f,-,-%n", node.id, node.x, node.y);
             }
 

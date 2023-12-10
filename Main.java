@@ -1,22 +1,31 @@
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * @author Soham
  */
 public class Main {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws Exception {
+//        ArrayList<Node> nodes = new ArrayList<>();
+//        int n = 100;
+//        double r = 0.2;
+//        int upperCap = 2;
+//        RandomSourceSinkGraphs graphGenerator1 = new RandomSourceSinkGraphs();
+//        nodes = graphGenerator1.generateGraph(n, r, upperCap, nodes);
+//        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-1.csv");
+        FetchResult graph1 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-5.csv");
+        ArrayList<ArrayList<Integer>> adj = RandomSourceSinkGraphs.generateAdjacencyList(graph1.fetchedNodes);
+        RandomSourceSinkGraphs.printGraph(adj);
+        FordFulkersonAlgorithm.performFordFulkerson("Graphs/Graph-5.csv");
+//        FetchResult graph2 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-2.csv");
+//        FetchResult graph3 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-3.csv");
+//        FetchResult graph4 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-4.csv");
+//        FetchResult graph5 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-5.csv");
+//        FetchResult graph6 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-6.csv");
+//        FetchResult graph7 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-7.csv");
+//        FetchResult graph8 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-8.csv");
 
-        System.out.println("Getting graph from csv: ");
 
-        FetchResult fetchedGraphFromCSV = FetchGraphCSV.fetchGraphFromCSV("Graph-1.csv");
-        for(Node node: fetchedGraphFromCSV.fetchedNodes){
-            System.out.println(node);
-        }
-        System.out.println("Source Node: " + fetchedGraphFromCSV.sourceNode);
-        System.out.println("Sink Node: " + fetchedGraphFromCSV.sinkNode);
     }
 
     static void generateGraphs() throws FileNotFoundException {
@@ -34,65 +43,71 @@ public class Main {
         int n = 100;
         double r = 0.2;
         int upperCap = 2;
-        RandomSourceSinkGraphs graphGenerator = new RandomSourceSinkGraphs();
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-1.csv");
-        System.out.println("Stored graph into csv");
+        RandomSourceSinkGraphs graphGenerator1 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator1.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-1.csv");
 
 //         generating graph no. 2
         nodes = new ArrayList<>();
         n = 200;
         r = 0.2;
         upperCap = 2;
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-2.csv");
+        RandomSourceSinkGraphs graphGenerator2 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator2.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-2.csv");
 
         // generating graph no. 3
         nodes = new ArrayList<>();
         n = 100;
         r = 0.3;
         upperCap = 2;
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-3.csv");
+        RandomSourceSinkGraphs graphGenerator3 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator3.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-3.csv");
 
         // generating graph no. 4
         nodes = new ArrayList<>();
         n = 200;
         r = 0.3;
         upperCap = 2;
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-4.csv");
+        RandomSourceSinkGraphs graphGenerator4 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator4.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-4.csv");
 
         // generating graph no. 5
         nodes = new ArrayList<>();
         n = 100;
         r = 0.2;
         upperCap = 50;
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-5.csv");
+        RandomSourceSinkGraphs graphGenerator5 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator5.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-5.csv");
 
         // generating graph no. 6
         nodes = new ArrayList<>();
         n = 200;
         r = 0.2;
         upperCap = 50;
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-6.csv");
+        RandomSourceSinkGraphs graphGenerator6 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator6.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-6.csv");
 
         // generating graph no. 7
         nodes = new ArrayList<>();
         n = 100;
         r = 0.3;
         upperCap = 50;
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-7.csv");
+        RandomSourceSinkGraphs graphGenerator7 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator7.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-7.csv");
 
         // generating graph no. 8
         nodes = new ArrayList<>();
         n = 200;
         r = 0.3;
         upperCap = 50;
-        nodes = graphGenerator.generateGraph(n, r, upperCap, nodes);
-        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graph-8.csv");
+        RandomSourceSinkGraphs graphGenerator8 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator8.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-8.csv");
     }
 }
