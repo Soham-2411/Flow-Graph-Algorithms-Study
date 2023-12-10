@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.Random;
 
@@ -43,8 +46,7 @@ class Node {
 
     @Override
     public String toString() {
-        System.out.println("Node: " + id + ": " + x + "," + y);
-        return null;
+        return "Node: " + id + ": " + x + "," + y;
     }
 }
 
@@ -52,6 +54,8 @@ class Node {
 public class RandomSourceSinkGraphs {
 
     ArrayList<ArrayList<Integer>> graphAdjacencyList;
+
+    ArrayList<ArrayList<HashMap<Integer, Integer>>> graphAdjacencyListWithCapacities;
 
     int sourceNode;
     int sinkNode;
@@ -77,7 +81,6 @@ public class RandomSourceSinkGraphs {
         for (int i : nodesList) {
             for (int j = 0; j < n; j++) {
                 if (i != j && calculateDistance(nodes.get(i), nodes.get(j)) <= r) {
-                    System.out.println(calculateDistance(nodes.get(i), nodes.get(j)) + ", " + r);
                     if (!nodes.get(i).containsEdgeWithNode(nodes.get(j))) {
                         nodes.get(i).addEdge(nodes.get(j), rand.nextInt(upperCap));
                     }
@@ -86,64 +89,81 @@ public class RandomSourceSinkGraphs {
         }
         generateAdjacencyList(nodes);
         printGraph();
-        //do {
-        sourceNode = 0;
-        //} while (graphAdjacencyList.get(sourceNode).size() > 2);
-
-        boolean[] visitedNodes = new boolean[graphAdjacencyList.size()];
+        do {
+            sourceNode = rand.nextInt(n);
+        } while (graphAdjacencyList.get(sourceNode).size() <= 1);
         for (int i = 0; i < nodes.size(); i++) {
             distanceToEachNodeForSource.add(0);
         }
-
-        System.out.println("RUNNING DFS");
-        dfs(sourceNode, visitedNodes, 0);
-        System.out.println(distanceToEachNodeForSource);
-        int count = 0, index = 0;
-        for (int i = 0; i < distanceToEachNodeForSource.size(); i++) {
-            if (count < distanceToEachNodeForSource.get(i)) {
-                count = distanceToEachNodeForSource.get(i);
-                index = i;
-                System.out.print(index + ", ");
+        System.out.println("RUNNING BFS");
+        bfs(sourceNode);
+        int maxValue = Integer.MIN_VALUE;
+        for(int dist : distanceToEachNodeForSource){
+            if(maxValue< dist && dist!=Integer.MAX_VALUE){
+                maxValue = dist;
             }
         }
-        sinkNode = nodes.get(index).id;
-        System.out.println("Source node: " + sourceNode + ", " + "Sink Node: " + sinkNode);
+        sinkNode = distanceToEachNodeForSource.indexOf(maxValue);
+        System.out.println("Source: " + sourceNode + " Sink: " + sinkNode);
+        System.out.println(distanceToEachNodeForSource);
     }
 
-    private void dfs(int V, boolean[] visitedNodes, int counter) {
-        visitedNodes[V] = true;
-        counter++;
-        System.out.println(V + ":" + counter);
-        for (Integer neighbour : graphAdjacencyList.get(V)) {
-            if (!visitedNodes[neighbour]) {
-                dfs(neighbour, visitedNodes, counter);
+    private void bfs(int source) {
+        LinkedList<Integer> queue = new LinkedList<>();
+        boolean[] visitedNodes = new boolean[graphAdjacencyList.size()];
+        for (int i = 0; i < graphAdjacencyList.size(); i++) {
+            visitedNodes[i] = false;
+            distanceToEachNodeForSource.set(i, Integer.MAX_VALUE);
+        }
+        visitedNodes[source] = true;
+        queue.add(source);
+        distanceToEachNodeForSource.set(source, 0);
+        while (!queue.isEmpty()) {
+            int cur = queue.remove();
+            for (int i = 0; i < graphAdjacencyList.get(cur).size(); i++) {
+                int neighbour = graphAdjacencyList.get(cur).get(i);
+                if (!visitedNodes[neighbour]) {
+                    visitedNodes[neighbour] = true;
+                    distanceToEachNodeForSource.set(neighbour, distanceToEachNodeForSource.get(cur) + 1);
+                    queue.add(neighbour);
+                }
             }
-            if (distanceToEachNodeForSource.get(V) < counter) {
-                distanceToEachNodeForSource.set(V, counter);
-            }
-            counter--;
         }
     }
 
     private void generateAdjacencyList(ArrayList<Node> nodes) {
         graphAdjacencyList = new ArrayList<>();
-//        for (Node node : nodes) {
-//            graphAdjacencyList.add(new ArrayList<>(List.of(node.id)));
-//            for (Edge edge : node.edges) {
-//                graphAdjacencyList.get(node.id).add(edge.to);
-//            }
-//        }
-        graphAdjacencyList = new ArrayList<>(List.of(new ArrayList<>(List.of(0, 1, 2, 3)),
-                new ArrayList<>(List.of(1, 4, 5)),
-                new ArrayList<>(List.of(2, 3)),
-                new ArrayList<>(List.of(3, 4)),
-                new ArrayList<>(List.of(4)),
-                new ArrayList<>(List.of(5, 2))));
+        graphAdjacencyListWithCapacities = new ArrayList<>();
+        for (Node node : nodes) {
+            graphAdjacencyList.add(new ArrayList<>(List.of(node.id)));
+            graphAdjacencyListWithCapacities.add(new ArrayList<>());
+            for (Edge edge : node.edges) {
+                graphAdjacencyListWithCapacities.get(node.id).add(new HashMap<>(1, 2));
+                graphAdjacencyList.get(node.id).add(edge.to);
+            }
+        }
+
+        graphAdjacencyListWithCapacities = new ArrayList<>();
+//        graphAdjacencyList = new ArrayList<>(List.of(new ArrayList<>(List.of(0, 1, 2, 3)),
+//                new ArrayList<>(List.of(1, 4)),
+//                new ArrayList<>(List.of(2, 3)),
+//                new ArrayList<>(List.of(3, 4)),
+//                new ArrayList<>(List.of(4, 5)),
+//                new ArrayList<>(List.of(5, 2))));
     }
 
     private void printGraph() {
         for (ArrayList<Integer> nodes : graphAdjacencyList) {
             System.out.println(nodes);
         }
+    }
+
+    public void writeIntoCSV() throws FileNotFoundException {
+        File csvFile = new File("Generated-Graphs.csv");
+        PrintWriter out = new PrintWriter(csvFile);
+        for(ArrayList<Integer> nodes: graphAdjacencyList){
+            out.println(nodes);
+        }
+        out.close();
     }
 }
