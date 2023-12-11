@@ -31,20 +31,25 @@ public class Main {
         //RandomSourceSinkGraphs.printGraph(graph.fetchedNodes);
         ArrayList<Node> residualGraph = runFordFulkersonAlgorithm(csvName);
         System.out.println();
+
         System.out.println("Shortest Augmenting Path (SAP)");
         ArrayList<Integer> shortestPath = runShortestPathAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
         System.out.print("Shortest path: ");
         System.out.println(shortestPath);
         System.out.println();
+
         System.out.println("DFS-Like");
         ArrayList<Integer> dfsLike = runDFSLikeAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
         System.out.print("Path: ");
         System.out.println(dfsLike);
         System.out.println();
-//        System.out.println("Maximum Capacity Algorithm");
-//        ArrayList<Integer> maxCapacityPath = runMaximumCapacityAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
-//        System.out.print("Path: ");
-//        System.out.println(maxCapacityPath);
+
+        System.out.println("Maximum Capacity Algorithm");
+        ArrayList<Integer> maxCapacityPath = runMaximumCapacityAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
+        System.out.print("Path: ");
+        System.out.println(maxCapacityPath);
+        System.out.println();
+
         System.out.println("Randomly Implemented dijkstra");
         ArrayList<Integer> randomDijkstra = runRandomDijkstraAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
         System.out.print("Path: ");
@@ -82,13 +87,17 @@ public class Main {
 
     static ArrayList<Integer> runMaximumCapacityAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode){
         MaximumCapacity maximumCapacity = new MaximumCapacity();
-        ArrayList<Integer> maxCapacity = maximumCapacity.dijkstraMaxCriticalCapacity(residualGraph, sourceNode, sinkNode);
+        Map<Integer, ArrayList<Integer>> maxCapacity = maximumCapacity.dijkstraMaxCriticalCapacity(residualGraph, sourceNode, sinkNode);
         System.out.println(maxCapacity);
-//        if(!maxCapacity.isEmpty()){
-//            maxCapacity.add(0, sourceNode);
-//        }
-
-        return maxCapacity;
+        int max = 0;
+        ArrayList<Integer> maxPath = new ArrayList<>();
+        for(Map.Entry<Integer, ArrayList<Integer>> entryset : maxCapacity.entrySet()){
+            if(entryset.getKey()>max){
+                maxPath = new ArrayList<>(entryset.getValue());
+            }
+        }
+        System.out.println("Maximum flow value: " + max);
+        return maxPath;
     }
 
     static ArrayList<Integer> runRandomDijkstraAlgorithm(ArrayList<Node> residualGraph, int sourceNode,  int sinkNode){
