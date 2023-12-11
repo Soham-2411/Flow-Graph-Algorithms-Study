@@ -6,43 +6,55 @@ import java.util.concurrent.TimeUnit;
 
 public class FordFulkersonAlgorithm {
 
-    public static void performFordFulkerson(String csvFileName) throws Exception {
+    ArrayList<ArrayList<Integer>> allPaths;
+    ArrayList<Node> residualGraph;
+
+
+    int maxFlow;
+
+    public ArrayList<Node> performFordFulkerson(String csvFileName) throws Exception {
         // Fetch the graph and source/sink nodes from CSV
         FetchResult fetchResult = FetchGraphCSV.fetchGraphFromCSV(csvFileName);
-
-        List<Node> nodes = fetchResult.fetchedNodes;
+        allPaths = new ArrayList<>();
+        ArrayList<Node> nodes = fetchResult.fetchedNodes;
         int sourceNode = fetchResult.sourceNode;
         int sinkNode = fetchResult.sinkNode;
         System.out.println(sourceNode + ", " + sinkNode);
         System.out.println("Started ford fulkerson");
         // Apply Ford-Fulkerson algorithm
-        int maxFlow = fordFulkerson(nodes, sourceNode, sinkNode);
+        maxFlow = fordFulkerson(nodes, sourceNode, sinkNode);
 
         // Print the maximum flow
         System.out.println("Maximum Flow: " + maxFlow);
+
+        return residualGraph;
     }
 
-    private static int fordFulkerson(List<Node> nodes, int source, int sink) throws InterruptedException {
-        int maxFlow = 0;
+
+
+    private int fordFulkerson(List<Node> nodes, int source, int sink) throws InterruptedException {
+        maxFlow = 0;
 
         // Initialize the residual graph with the original capacities
-        List<Node> residualGraph = new ArrayList<>(nodes);
+        residualGraph = new ArrayList<>(nodes);
         System.out.println("Initialized residual graph");
-        printResidualGraph(residualGraph);
+        //printResidualGraph(residualGraph);
         // Continue finding augmenting paths and updating the flow until no more paths
-        List<Integer> augmentingPath = findAugmentingPath(residualGraph, source, sink);
-        List<Integer> finalpath = augmentingPath;
-
+        ArrayList<Integer> augmentingPath = findAugmentingPath(residualGraph, source, sink);
+        int noOfAugmentingPaths = 0;
         while (augmentingPath != null) {
+            allPaths.add(augmentingPath);
+            noOfAugmentingPaths++;
             int minCapacity = findMinCapacity(residualGraph, augmentingPath);
             updateResidualGraph(residualGraph, augmentingPath, minCapacity);
             maxFlow += minCapacity;
             augmentingPath = findAugmentingPath(residualGraph, source, sink);
-            if(augmentingPath!=null){
-                finalpath = augmentingPath;
-            }
         }
-        System.out.println(finalpath);
+        System.out.println("All the paths: ");
+        for(ArrayList<Integer> path : allPaths){
+            System.out.println(path);
+        }
+        System.out.println("Paths: " + noOfAugmentingPaths);
         return maxFlow;
     }
 
@@ -55,7 +67,7 @@ public class FordFulkersonAlgorithm {
             System.out.println();
         }
     }
-    private static List<Integer> findAugmentingPath(List<Node> residualGraph, int source, int sink) {
+    private ArrayList<Integer> findAugmentingPath(List<Node> residualGraph, int source, int sink) {
         // Use BFS to find an augmenting path
         Queue<Integer> queue = new LinkedList<>();
         Map<Integer, Integer> parentMap = new HashMap<>();
@@ -75,7 +87,7 @@ public class FordFulkersonAlgorithm {
 
                     if (neighborId == sink) {
                         // Found an augmenting path
-                        List<Integer> path = new ArrayList<>();
+                        ArrayList<Integer> path = new ArrayList<>();
                         int node = sink;
 
                         while (node != -1) {
@@ -94,7 +106,7 @@ public class FordFulkersonAlgorithm {
         return null;
     }
 
-    private static int findMinCapacity(List<Node> residualGraph, List<Integer> path) {
+    private int findMinCapacity(List<Node> residualGraph, List<Integer> path) {
         int minCapacity = Integer.MAX_VALUE;
 
         for (int i = 0; i < path.size() - 1; i++) {
@@ -112,7 +124,7 @@ public class FordFulkersonAlgorithm {
         return minCapacity;
     }
 
-    private static void updateResidualGraph(List<Node> residualGraph, List<Integer> path, int minCapacity) {
+    private void updateResidualGraph(List<Node> residualGraph, List<Integer> path, int minCapacity) {
         for (int i = 0; i < path.size() - 1; i++) {
             Node node = findNodeById(residualGraph, path.get(i));
             Node nextNode = findNodeById(residualGraph, path.get(i + 1));
@@ -133,7 +145,7 @@ public class FordFulkersonAlgorithm {
         }
     }
 
-    private static Node findNodeById(List<Node> nodes, int nodeId) {
+    private Node findNodeById(List<Node> nodes, int nodeId) {
         for (Node node : nodes) {
             if (node.id == nodeId) {
                 return node;

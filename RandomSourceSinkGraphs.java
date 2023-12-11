@@ -4,57 +4,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Random;
 
-class Edge {
-    int capacity;
-    int to;
 
-    public Edge(int to, int capacity) {
-        this.to = to;
-        this.capacity = capacity;
-    }
-
-    @Override
-    public String toString() {
-        return "Connected to: " + to + " with capacity: " + capacity;
-    }
-}
-
-class Node {
-    int id;
-    double x, y;
-    LinkedList<Edge> edges;
-
-    public Node(int id, double x, double y) {
-        this.id = id;
-        DecimalFormat df = new DecimalFormat("0.00");
-        this.x = Double.parseDouble(df.format(x));
-        this.y = Double.parseDouble(df.format(y));
-        this.edges = new LinkedList<>();
-    }
-
-    public void addEdge(Node node, int capacity) {
-        edges.add(new Edge(node.id, capacity));
-    }
-
-    public boolean containsEdgeWithNode(Node node) {
-        for (Edge edge : this.edges) {
-            if (edge.to == node.id) {
-                return true;
-            }
-        }
-        for (Edge edge : node.edges) {
-            if (edge.to == this.id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "Node: " + id + ": " + x + "," + y + edges;
-    }
-}
 
 
 public class RandomSourceSinkGraphs {
@@ -91,14 +41,13 @@ public class RandomSourceSinkGraphs {
             for (int j = 0; j < n; j++) {
                 if (i != j && calculateDistance(nodes.get(i), nodes.get(j)) <= r) {
                     if (!nodes.get(i).containsEdgeWithNode(nodes.get(j))) {
-                        int capacity = randNum.nextInt(upperCap+1);
+                        int capacity = randNum.nextInt(upperCap) + 1;
                         nodes.get(i).addEdge(nodes.get(j), capacity);
                     }
                 }
             }
         }
         graphAdjacencyList = generateAdjacencyList(nodes);
-        printGraph(graphAdjacencyList);
         do {
             sourceNode = randNum.nextInt(n - 1);
             System.out.println("Generated : " + sourceNode);
@@ -155,9 +104,13 @@ public class RandomSourceSinkGraphs {
     }
 
 
-    public static void printGraph(ArrayList<ArrayList<Integer>> graph) {
-        for (ArrayList<Integer> nodes : graph) {
-            System.out.println(nodes);
+    public static void printGraph(ArrayList<Node> graph) {
+        for (Node node : graph) {
+            System.out.print("Node " + node.id + ": ");
+            for (Edge edge : node.edges) {
+                System.out.print("(" + edge.to + ", " + edge.capacity + ") ");
+            }
+            System.out.println();
         }
     }
 

@@ -1,5 +1,5 @@
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * @author Soham
@@ -13,10 +13,8 @@ public class Main {
 //        RandomSourceSinkGraphs graphGenerator1 = new RandomSourceSinkGraphs();
 //        nodes = graphGenerator1.generateGraph(n, r, upperCap, nodes);
 //        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-1.csv");
-        FetchResult graph1 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-5.csv");
-        ArrayList<ArrayList<Integer>> adj = RandomSourceSinkGraphs.generateAdjacencyList(graph1.fetchedNodes);
-        RandomSourceSinkGraphs.printGraph(adj);
-        FordFulkersonAlgorithm.performFordFulkerson("Graphs/Graph-5.csv");
+//        generateGraphs();
+        runAlgorithmsOnGraph("Graphs/Graph-8.csv");
 //        FetchResult graph2 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-2.csv");
 //        FetchResult graph3 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-3.csv");
 //        FetchResult graph4 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-4.csv");
@@ -27,6 +25,67 @@ public class Main {
 
 
     }
+
+    static void runAlgorithmsOnGraph(String csvName) throws Exception {
+        FetchResult graph = FetchGraphCSV.fetchGraphFromCSV(csvName);
+        //RandomSourceSinkGraphs.printGraph(graph.fetchedNodes);
+        ArrayList<Node> residualGraph = runFordFulkersonAlgorithm(csvName);
+        System.out.println();
+        System.out.println("Shortest Augmenting Path (SAP)");
+        ArrayList<Integer> shortestPath = runShortestPathAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
+        System.out.print("Shortest path: ");
+        System.out.println(shortestPath);
+        System.out.println();
+        System.out.println("DFS-Like");
+        ArrayList<Integer> dfsLike = runDFSLikeAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
+        System.out.print("Path: ");
+        System.out.println(dfsLike);
+        System.out.println();
+        ArrayList<Integer> maxCapacityPath = runMaximumCapacityAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
+        System.out.print("Path: ");
+        System.out.println(maxCapacityPath);
+
+    }
+
+    static ArrayList<Node> runFordFulkersonAlgorithm(String csvName) throws Exception {
+        FordFulkersonAlgorithm fordFulkersonAlgorithm = new FordFulkersonAlgorithm();
+        ArrayList<Node> residualGraph = fordFulkersonAlgorithm.performFordFulkerson(csvName);
+        //RandomSourceSinkGraphs.printGraph(residualGraph);
+        return residualGraph;
+    }
+
+    // returns an arraylist (shortest path) from source to sink
+    static ArrayList<Integer> runShortestPathAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
+        ShortestAugmentingPath shortestAugmentingPath = new ShortestAugmentingPath();
+        Map<Integer, ArrayList<Integer>> Sap = shortestAugmentingPath.findShortestAugmentingPath(residualGraph, sourceNode, sinkNode);
+        if (!Sap.get(sinkNode).isEmpty()) {
+            Sap.get(sinkNode).add(0, sourceNode);
+        }
+        return Sap.get(sinkNode);
+    }
+
+    static ArrayList<Integer> runDFSLikeAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
+        DFSLike dfsLike = new DFSLike();
+        Map<Integer, ArrayList<Integer>> dfs = dfsLike.modifiedVersionOfDFS(residualGraph, sourceNode, sinkNode);
+        if (!dfs.get(sinkNode).isEmpty()) {
+            dfs.get(sinkNode).add(0, sourceNode);
+        }
+        return dfs.get(sinkNode);
+    }
+
+    static ArrayList<Integer> runMaximumCapacityAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode){
+        MaximumCapacity maximumCapacity = new MaximumCapacity();
+        ArrayList<Integer> maxCapacity = maximumCapacity.dijkstraMaxCriticalCapacity(residualGraph, sourceNode, sinkNode);
+        System.out.println(maxCapacity);
+//        if(!maxCapacity.isEmpty()){
+//            maxCapacity.add(0, sourceNode);
+//        }
+
+        return maxCapacity;
+    }
+
+
+
 
     static void generateGraphs() throws FileNotFoundException {
 //        Generating graphs based on the data given in the project description:
@@ -39,6 +98,15 @@ public class Main {
 //        7. n = 100, r = 0.3, upperCap = 50
 //        8. n = 200, r = 0.3, upperCap = 50
 
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Are you sure you want to regenerate graphs? It will erase all the previous data (Y/N)");
+        String yesOrNo = scanner.nextLine();
+        if (!yesOrNo.equals("Y")) {
+            return;
+        }
+        System.out.println("Generating graphs");
+        // generating graph no. 1
         ArrayList<Node> nodes = new ArrayList<>();
         int n = 100;
         double r = 0.2;
@@ -46,8 +114,7 @@ public class Main {
         RandomSourceSinkGraphs graphGenerator1 = new RandomSourceSinkGraphs();
         nodes = graphGenerator1.generateGraph(n, r, upperCap, nodes);
         RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-1.csv");
-
-//         generating graph no. 2
+        // generating graph no. 2
         nodes = new ArrayList<>();
         n = 200;
         r = 0.2;
