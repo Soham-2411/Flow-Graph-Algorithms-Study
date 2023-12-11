@@ -6,69 +6,51 @@ import java.util.*;
 public class MaximumCapacity {
 
     static int maxCapacity;
-    public static Map<Integer, ArrayList<Integer>> dijkstraMaxCriticalCapacity(ArrayList<Node> residualGraph, int source, int sink) {
-        Map<Integer, ArrayList<Integer>> criticalFlows = new HashMap<>();
-        ArrayList<Integer> currentPath = new ArrayList<>();
-        Set<Integer> visited = new HashSet<>();
+    public ArrayList<Integer> dijkstraMaxCriticalCapacity(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
+        Map<Integer, Double> distances = new HashMap<>();
+        Map<Integer, Node> previousNodes = new HashMap<>();
 
-        modifiedDijkstra(residualGraph, source, sink, currentPath, visited, criticalFlows);
+        for (Node node : residualGraph) {
+            distances.put(node.id, Double.POSITIVE_INFINITY);
+            previousNodes.put(node.id, null);
+        }
+        PriorityQueue<Node> minHeap = new PriorityQueue<>(Comparator.comparingDouble(node -> distances.get(node.id)));
+        distances.put(sourceNode, 0.0);
+        minHeap.add(residualGraph.get(sourceNode));
 
-        return criticalFlows;
-    }
+        while (!minHeap.isEmpty()) {
+            Node currentNode = minHeap.poll();
 
-    private static void modifiedDijkstra(ArrayList<Node> residualGraph, int currentNode, int sink, List<Integer> currentPath, Set<Integer> visited, Map<Integer, ArrayList<Integer>> criticalFlows) {
-        visited.add(currentNode);
-        currentPath.add(currentNode);
+            for (Edge edge : currentNode.edges) {
+                Node neighbor = Node.findNodeById(residualGraph, edge.to);
 
-        if (currentNode == sink) {
-            // Reached the sink, calculate the critical flow for this path
-            int criticalFlow = Integer.MAX_VALUE;
-            for (int i = 0; i < currentPath.size() - 1; i++) {
-                Node node = Node.findNodeById(residualGraph, currentPath.get(i));
-                for (Edge edge : node.edges) {
-                    if (edge.to == currentPath.get(i + 1)) {
-                        criticalFlow = Math.min(criticalFlow, edge.capacity);
-                        break;
-                    }
+                double newDistance = distances.get(currentNode.id) + edge.capacity;
+
+                if (newDistance < distances.get(neighbor.id)) {
+                    distances.put(neighbor.id, newDistance);
+                    previousNodes.put(neighbor.id, currentNode);
+                    minHeap.add(neighbor);
                 }
             }
-
-            // Update the map with the critical flow and path
-            if (!criticalFlows.containsKey(criticalFlow)) {
-                criticalFlows.put(criticalFlow, new ArrayList<>());
-            }
-            criticalFlows.get(criticalFlow).addAll(currentPath);
-
-            // Backtrack to find more paths
-            visited.remove(currentNode);
-            currentPath.remove(currentPath.size() - 1);
-            return;
         }
 
-        Node node = Node.findNodeById(residualGraph, currentNode);
-        for (Edge edge : node.edges) {
-            if (!visited.contains(edge.to) && edge.capacity > 0) {
-                modifiedDijkstra(residualGraph, edge.to, sink, currentPath, visited, criticalFlows);
-            }
+        // Reconstruct the path
+        Node current = residualGraph.get(sinkNode);
+        ArrayList<Node> path = new ArrayList<>();
+
+        while (current != null) {
+            path.add(current);
+            current = previousNodes.get(current.id);
         }
 
-        visited.remove(currentNode);
-        currentPath.remove(currentPath.size() - 1);
-    }
+        Collections.reverse(path);
 
-    static class CounterNodeCapacity implements Comparable<CounterNodeCapacity> {
-        int nodeId;
-        int capacity;
-
-        public CounterNodeCapacity(int nodeId, int capacity) {
-            this.nodeId = nodeId;
-            this.capacity = capacity;
+        ArrayList<Integer> maxPath = new ArrayList<>();
+        for(Node node: path){
+            maxPath.add(node.id);
         }
 
-        @Override
-        public int compareTo(CounterNodeCapacity other) {
-            // Compare based on capacity, with higher capacities coming first
-            return Integer.compare(other.capacity, this.capacity);
-        }
+        System.out.println("Maximum Flow Value: " + distances.get(sinkNode));
+        return maxPath;
     }
 }

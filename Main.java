@@ -14,7 +14,7 @@ public class Main {
 //        nodes = graphGenerator1.generateGraph(n, r, upperCap, nodes);
 //        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-1.csv");
 //        generateGraphs();
-        runAlgorithmsOnGraph("Graphs/Graph-8.csv");
+        runAlgorithmsOnGraph("Graphs/Graph-2.csv");
 //        FetchResult graph2 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-2.csv");
 //        FetchResult graph3 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-3.csv");
 //        FetchResult graph4 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-4.csv");
@@ -87,22 +87,16 @@ public class Main {
 
     static ArrayList<Integer> runMaximumCapacityAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode){
         MaximumCapacity maximumCapacity = new MaximumCapacity();
-        Map<Integer, ArrayList<Integer>> maxCapacity = maximumCapacity.dijkstraMaxCriticalCapacity(residualGraph, sourceNode, sinkNode);
-        System.out.println(maxCapacity);
-        int max = 0;
-        ArrayList<Integer> maxPath = new ArrayList<>();
-        for(Map.Entry<Integer, ArrayList<Integer>> entryset : maxCapacity.entrySet()){
-            if(entryset.getKey()>max){
-                maxPath = new ArrayList<>(entryset.getValue());
-            }
-        }
-        System.out.println("Maximum flow value: " + max);
-        return maxPath;
+        ArrayList<Integer> maxCapacity = maximumCapacity.dijkstraMaxCriticalCapacity(residualGraph, sourceNode, sinkNode);
+        return maxCapacity;
     }
 
     static ArrayList<Integer> runRandomDijkstraAlgorithm(ArrayList<Node> residualGraph, int sourceNode,  int sinkNode){
         RandomDijkstra randomDijkstra = new RandomDijkstra();
         Map<Integer, ArrayList<Integer>> randomPath = randomDijkstra.dijkstraWithRandomizedPriority(residualGraph, sourceNode, sinkNode);
+        if(!randomPath.get(sinkNode).isEmpty()){
+            randomPath.get(sinkNode).add(0, sourceNode);
+        }
         return randomPath.get(sinkNode);
     }
 
