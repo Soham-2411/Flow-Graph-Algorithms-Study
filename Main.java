@@ -41,9 +41,16 @@ public class Main {
         System.out.print("Path: ");
         System.out.println(dfsLike);
         System.out.println();
-        ArrayList<Integer> maxCapacityPath = runMaximumCapacityAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
+//        System.out.println("Maximum Capacity Algorithm");
+//        ArrayList<Integer> maxCapacityPath = runMaximumCapacityAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
+//        System.out.print("Path: ");
+//        System.out.println(maxCapacityPath);
+        System.out.println("Randomly Implemented dijkstra");
+        ArrayList<Integer> randomDijkstra = runRandomDijkstraAlgorithm(residualGraph, graph.sourceNode, graph.sinkNode);
         System.out.print("Path: ");
-        System.out.println(maxCapacityPath);
+        System.out.println(randomDijkstra);
+        System.out.println();
+
 
     }
 
@@ -82,6 +89,12 @@ public class Main {
 //        }
 
         return maxCapacity;
+    }
+
+    static ArrayList<Integer> runRandomDijkstraAlgorithm(ArrayList<Node> residualGraph, int sourceNode,  int sinkNode){
+        RandomDijkstra randomDijkstra = new RandomDijkstra();
+        Map<Integer, ArrayList<Integer>> randomPath = randomDijkstra.dijkstraWithRandomizedPriority(residualGraph, sourceNode, sinkNode);
+        return randomPath.get(sinkNode);
     }
 
 

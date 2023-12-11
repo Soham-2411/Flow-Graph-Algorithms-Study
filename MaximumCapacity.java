@@ -7,81 +7,77 @@ public class MaximumCapacity {
 
     static int maxCapacity;
     public ArrayList<Integer> dijkstraMaxCriticalCapacity(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
-        Map<Integer, Integer> criticalCapacities = new HashMap<>();
-        Map<Integer, ArrayList<Integer>> paths = new HashMap<>();
-        PriorityQueue<NodeCriticalCapacity> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
+        // Initialize distances and predecessors
+        Map<Integer, Integer> distances = new HashMap<>();
+        Map<Integer, Integer> predecessors = new HashMap<>();
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.comparingInt(distances::get));
 
-        // Initialize critical capacities to infinity and add the source node
         for (Node node : residualGraph) {
-            criticalCapacities.put(node.id, Integer.MAX_VALUE);
+            int nodeId = node.id;
+            distances.put(nodeId, Integer.MAX_VALUE);
+            predecessors.put(nodeId, null);
         }
-        criticalCapacities.put(sourceNode, Integer.MAX_VALUE);
-        priorityQueue.add(new NodeCriticalCapacity(sourceNode, Integer.MAX_VALUE));
 
-        while (!priorityQueue.isEmpty()) {
-            NodeCriticalCapacity currentNode = priorityQueue.poll();
-            int currentId = currentNode.nodeId;
-            int currentCriticalCapacity = currentNode.criticalCapacity;
+        distances.put(sourceNode, 0);
+        pq.add(sourceNode);
 
-            if (currentCriticalCapacity == 0 || currentId == sinkNode) {
-                // If critical capacity is zero or sink node is reached, break out of the loop
-                break;
-            }
+        while (!pq.isEmpty()) {
+            int currentId = pq.poll();
 
-            Node node = Node.findNodeById(residualGraph, currentId);
+            for (Node neighbor : Node.findNodeById(residualGraph, currentId).getNeighbors(residualGraph)) {
+                try {
+                    int capacity = getCapacity(currentId, neighbor.id, residualGraph);
+                    int alt = Math.min(distances.get(currentId), capacity);
 
-            for (Edge edge : node.edges) {
-                System.out.println("Entering node" + node.id);
-                int neighborId = edge.to;
-                int edgeCapacity = edge.capacity;
-                System.out.println("Current capacity: " + currentCriticalCapacity + " Edge capacity: " + edgeCapacity + " Neighbor: " + neighborId);
-                int newCriticalCapacity = Math.min(currentCriticalCapacity, edgeCapacity);
+                    if (alt > distances.get(neighbor.id)) {
+                        distances.put(neighbor.id, alt);
+                        predecessors.put(neighbor.id, currentId);
+                        pq.add(neighbor.id);
+                    }
+                }catch (Exception e){
+                    System.out.println("Empty neighbors");
+                }
 
-                //if (newCriticalCapacity > criticalCapacities.get(neighborId) || criticalCapacities.get(neighborId) == Integer.MAX_VALUE) {
-                    criticalCapacities.put(neighborId, newCriticalCapacity);
-
-                    // Update the augmenting path
-                    ArrayList<Integer> currentPath = paths.getOrDefault(currentId, new ArrayList<>());
-                    ArrayList<Integer> newPath = new ArrayList<>(currentPath);
-                    newPath.add(neighborId);
-                    paths.put(neighborId, newPath);
-
-                    priorityQueue.add(new NodeCriticalCapacity(neighborId, newCriticalCapacity));
-                //}
             }
         }
 
-        double meanLength = 0;
-        for (Map.Entry<Integer, ArrayList<Integer>> node : paths.entrySet()) {
-            meanLength += node.getValue().size();
+        // Reconstruct the path
+        ArrayList<Integer> path = new ArrayList<>();
+        int currentId = sinkNode;
+        System.out.println(predecessors);
+        while (currentId != 0) { // Stop when reaching the source with ID 0
+            path.add(currentId);
+            System.out.println(path);
+            currentId = predecessors.get(currentId);
         }
-        List<Integer> longestPath = FindLongestAcyclicPath.findLongestAcyclicPath(residualGraph, sourceNode, sinkNode);
-        if (!longestPath.isEmpty()) {
-            longestPath.add(0, sourceNode);
-        }
-        meanLength /= paths.size();
-        System.out.println(paths);
-        System.out.println("Mean length: " + meanLength);
-        System.out.println("Mean Proportional length (mean length/longest path size): " + meanLength / longestPath.size());
-        System.out.println("Total number of edges in the graph: " + Node.getNoOfEdges(residualGraph));
-        System.out.println("Maximum capacity: " + maxCapacity);
-        return paths.get(sinkNode);
+
+        Collections.reverse(path);
+        return path;
     }
 
-
-    static class NodeCriticalCapacity implements Comparable<NodeCriticalCapacity> {
-        int nodeId;
-        int criticalCapacity;
-
-        public NodeCriticalCapacity(int nodeId, int criticalCapacity) {
-            this.nodeId = nodeId;
-            this.criticalCapacity = criticalCapacity;
+    private static int getCapacity(int fromId, int toId, ArrayList<Node> nodes) {
+        Node from = Node.findNodeById(nodes, fromId);
+        for (Edge edge : from.edges) {
+            if (edge.to == toId) {
+                return edge.capacity;
+            }
         }
-
-        @Override
-        public int compareTo(NodeCriticalCapacity other) {
-            // Compare based on critical capacity, with higher capacities coming first
-            return Integer.compare(other.criticalCapacity, this.criticalCapacity);
-        }
+        return 0; // No direct edge from 'from' to 'to'
     }
+
+//    static class NodeCriticalCapacity implements Comparable<NodeCriticalCapacity> {
+//        int nodeId;
+//        int criticalCapacity;
+//
+//        public NodeCriticalCapacity(int nodeId, int criticalCapacity) {
+//            this.nodeId = nodeId;
+//            this.criticalCapacity = criticalCapacity;
+//        }
+//
+//        @Override
+//        public int compareTo(NodeCriticalCapacity other) {
+//            // Compare based on critical capacity, with higher capacities coming first
+//            return Integer.compare(other.criticalCapacity, this.criticalCapacity);
+//        }
+//    }
 }
