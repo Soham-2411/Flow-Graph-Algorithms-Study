@@ -9,14 +9,18 @@ public class MaximumCapacity {
     public ArrayList<Integer> dijkstraMaxCriticalCapacity(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
         Map<Integer, Double> distances = new HashMap<>();
         Map<Integer, Node> previousNodes = new HashMap<>();
+        double meanLength = 0;
 
         for (Node node : residualGraph) {
             distances.put(node.id, Double.POSITIVE_INFINITY);
             previousNodes.put(node.id, null);
         }
         PriorityQueue<Node> minHeap = new PriorityQueue<>(Comparator.comparingDouble(node -> distances.get(node.id)));
-        distances.put(sourceNode, 0.0);
+        distances.put(sourceNode, 1.0);
         minHeap.add(residualGraph.get(sourceNode));
+
+        double totalLength = 0;
+        int pathCount = 0;
 
         while (!minHeap.isEmpty()) {
             Node currentNode = minHeap.poll();
@@ -30,6 +34,8 @@ public class MaximumCapacity {
                     distances.put(neighbor.id, newDistance);
                     previousNodes.put(neighbor.id, currentNode);
                     minHeap.add(neighbor);
+                    totalLength +=edge.capacity;
+                    pathCount++;
                 }
             }
         }
@@ -49,8 +55,17 @@ public class MaximumCapacity {
         for(Node node: path){
             maxPath.add(node.id);
         }
+        meanLength = pathCount > 0 ? totalLength / pathCount : 0.0;
 
+        List<Integer> longestPath = FindLongestAcyclicPath.findLongestAcyclicPath(residualGraph, sourceNode, sinkNode);
+        if (!longestPath.isEmpty()) {
+            longestPath.add(0, sourceNode);
+        }
+        System.out.println("Paths: " + pathCount);
+        System.out.println("Mean length: " + meanLength);
+        System.out.println("Mean Proportional length (mean length/longest path size): " + meanLength / longestPath.size());
         System.out.println("Maximum Flow Value: " + distances.get(sinkNode));
+        System.out.println("Total number of edges in the graph: " + Node.getNoOfEdges(residualGraph));
         return maxPath;
     }
 }

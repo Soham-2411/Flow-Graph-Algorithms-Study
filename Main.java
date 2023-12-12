@@ -6,29 +6,30 @@ import java.util.*;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-//        ArrayList<Node> nodes = new ArrayList<>();
-//        int n = 100;
-//        double r = 0.2;
-//        int upperCap = 2;
-//        RandomSourceSinkGraphs graphGenerator1 = new RandomSourceSinkGraphs();
-//        nodes = graphGenerator1.generateGraph(n, r, upperCap, nodes);
-//        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/Graph-1.csv");
+        // this method is commented out because the graphs have already been generated
 //        generateGraphs();
+        System.out.println("------------------------------------GRAPH 1------------------------------------");
+        runAlgorithmsOnGraph("Graphs/Graph-1.csv");
+        System.out.println("------------------------------------GRAPH 2------------------------------------");
         runAlgorithmsOnGraph("Graphs/Graph-2.csv");
-//        FetchResult graph2 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-2.csv");
-//        FetchResult graph3 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-3.csv");
-//        FetchResult graph4 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-4.csv");
-//        FetchResult graph5 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-5.csv");
-//        FetchResult graph6 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-6.csv");
-//        FetchResult graph7 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-7.csv");
-//        FetchResult graph8 = FetchGraphCSV.fetchGraphFromCSV("Graphs/Graph-8.csv");
-
-
+        System.out.println("------------------------------------GRAPH 3------------------------------------");
+        runAlgorithmsOnGraph("Graphs/Graph-3.csv");
+        System.out.println("------------------------------------GRAPH 4------------------------------------");
+        runAlgorithmsOnGraph("Graphs/Graph-4.csv");
+        System.out.println("------------------------------------GRAPH 5------------------------------------");
+        runAlgorithmsOnGraph("Graphs/Graph-5.csv");
+        System.out.println("------------------------------------GRAPH 6------------------------------------");
+        runAlgorithmsOnGraph("Graphs/Graph-6.csv");
+        System.out.println("------------------------------------GRAPH 7------------------------------------");
+        runAlgorithmsOnGraph("Graphs/Graph-7.csv");
+        System.out.println("------------------------------------GRAPH 8------------------------------------");
+        runAlgorithmsOnGraph("Graphs/Graph-8.csv");
     }
 
     static void runAlgorithmsOnGraph(String csvName) throws Exception {
+
+        System.out.println("Running graph: " + csvName);
         FetchResult graph = FetchGraphCSV.fetchGraphFromCSV(csvName);
-        //RandomSourceSinkGraphs.printGraph(graph.fetchedNodes);
         ArrayList<Node> residualGraph = runFordFulkersonAlgorithm(csvName);
         System.out.println();
 
@@ -78,7 +79,7 @@ public class Main {
 
     static ArrayList<Integer> runDFSLikeAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
         DFSLike dfsLike = new DFSLike();
-        Map<Integer, ArrayList<Integer>> dfs = dfsLike.modifiedVersionOfDFS(residualGraph, sourceNode, sinkNode);
+        Map<Integer, ArrayList<Integer>> dfs = dfsLike.decreasingDijkstra(residualGraph, sourceNode, sinkNode);
         if (!dfs.get(sinkNode).isEmpty()) {
             dfs.get(sinkNode).add(0, sourceNode);
         }

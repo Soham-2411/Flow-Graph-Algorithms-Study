@@ -19,7 +19,7 @@ public class FordFulkersonAlgorithm {
         ArrayList<Node> nodes = fetchResult.fetchedNodes;
         int sourceNode = fetchResult.sourceNode;
         int sinkNode = fetchResult.sinkNode;
-        System.out.println(sourceNode + ", " + sinkNode);
+        System.out.println("Source Node: " + sourceNode + ", Sink Node: " + sinkNode);
         System.out.println("Started ford fulkerson");
         // Apply Ford-Fulkerson algorithm
         maxFlow = fordFulkerson(nodes, sourceNode, sinkNode);

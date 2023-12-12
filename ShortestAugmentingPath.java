@@ -45,8 +45,10 @@ public class ShortestAugmentingPath {
             }
         }
         double meanLength = 0;
+        int paths = 0;
         for(Map.Entry<Integer, ArrayList<Integer>> node : shortestPaths.entrySet()){
             meanLength+=node.getValue().size();
+            paths++;
         }
         List<Integer> longestPath = FindLongestAcyclicPath.findLongestAcyclicPath(residualGraph, sourceNode, sinkNode);
         if (!longestPath.isEmpty()) {
@@ -54,6 +56,7 @@ public class ShortestAugmentingPath {
         }
         meanLength /= shortestPaths.size();
         //System.out.println(shortestPaths);
+        System.out.println("Paths: " + paths);
         System.out.println("Mean length: " + meanLength);
         System.out.println("Mean Proportional length (mean length/longest path size): " + meanLength / longestPath.size());
         System.out.println("Total number of edges in the graph: " + Node.getNoOfEdges(residualGraph));

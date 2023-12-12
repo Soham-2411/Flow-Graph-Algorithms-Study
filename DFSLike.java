@@ -5,7 +5,7 @@ import java.util.*;
  */
 public class DFSLike {
 
-    public Map<Integer, ArrayList<Integer>> modifiedVersionOfDFS(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
+    public Map<Integer, ArrayList<Integer>> decreasingDijkstra(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
         Map<Integer, Integer> distances = new HashMap<>();
         Map<Integer, ArrayList<Integer>> shortestPaths = new HashMap<>();
         PriorityQueue<CounterNodeDistance> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
@@ -44,14 +44,17 @@ public class DFSLike {
             }
         }
         double meanLength = 0;
+        int paths = 0;
         for (Map.Entry<Integer, ArrayList<Integer>> node : shortestPaths.entrySet()) {
             meanLength += node.getValue().size();
+            paths++;
         }
         List<Integer> longestPath = FindLongestAcyclicPath.findLongestAcyclicPath(residualGraph, sourceNode, sinkNode);
         if (!longestPath.isEmpty()) {
             longestPath.add(0, sourceNode);
         }
         meanLength /= shortestPaths.size();
+        System.out.println("Paths: " + paths);
         System.out.println("Mean length: " + meanLength);
         System.out.println("Mean Proportional length (mean length/longest path size): " + meanLength / longestPath.size());
         System.out.println("Total number of edges in the graph: " + Node.getNoOfEdges(residualGraph));
