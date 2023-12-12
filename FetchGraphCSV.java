@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * This class helps retrieve all the data from the csv file and store it in an instance of the
+ * Fetch Result graph
  * @author Soham
  */
 public class FetchGraphCSV {

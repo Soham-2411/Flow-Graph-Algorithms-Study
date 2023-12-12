@@ -1,6 +1,8 @@
 import java.util.*;
 
 /**
+ * This class runs the dijkstra's algorithm with each node being selected from a
+ * randomly shuffled list
  * @author Soham
  */
 public class RandomDijkstra {

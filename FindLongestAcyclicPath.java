@@ -1,6 +1,8 @@
 import java.util.*;
 
 /**
+ * This class is implemented to calculate the longest acyclic path between two nodes
+ * To avoid code redundancy
  * @author Soham
  */
 public class FindLongestAcyclicPath {

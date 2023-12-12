@@ -5,8 +5,9 @@ import java.util.*;
 import java.util.Random;
 
 
-
-
+/**
+ * This class is made to generate random graphs based on the set of n, r and upperCap values provided.
+ */
 public class RandomSourceSinkGraphs {
 
     ArrayList<ArrayList<Integer>> graphAdjacencyList;

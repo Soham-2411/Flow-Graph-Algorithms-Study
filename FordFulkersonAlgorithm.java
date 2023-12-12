@@ -4,6 +4,10 @@
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This class performs the ford fulkerson algorithm and returns the residual graph
+ * that can be used to implement the other 4 algorithms
+ */
 public class FordFulkersonAlgorithm {
 
     ArrayList<ArrayList<Integer>> allPaths;

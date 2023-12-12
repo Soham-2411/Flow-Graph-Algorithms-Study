@@ -7,7 +7,7 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) throws Exception {
         // this method is commented out because the graphs have already been generated
-//        generateGraphs();
+        //generateCustomGraphs();
         System.out.println("------------------------------------GRAPH 1------------------------------------");
         runAlgorithmsOnGraph("Graphs/Graph-1.csv");
         System.out.println("------------------------------------GRAPH 2------------------------------------");
@@ -24,8 +24,15 @@ public class Main {
         runAlgorithmsOnGraph("Graphs/Graph-7.csv");
         System.out.println("------------------------------------GRAPH 8------------------------------------");
         runAlgorithmsOnGraph("Graphs/Graph-8.csv");
+        System.out.println("------------------------------------Custom GRAPH 1------------------------------------");
+        runAlgorithmsOnGraph("Graphs/CustomGraph-1.csv");
+        System.out.println("------------------------------------Custom GRAPH 2------------------------------------");
+        runAlgorithmsOnGraph("Graphs/CustomGraph-2.csv");
     }
 
+    /*
+    This method runs all the algorithms on the given graph
+     */
     static void runAlgorithmsOnGraph(String csvName) throws Exception {
 
         System.out.println("Running graph: " + csvName);
@@ -60,6 +67,10 @@ public class Main {
 
     }
 
+    /*
+    To run the ford fulkerson algorithm
+    returns an arraylist (shortest path) from source to sink
+     */
     static ArrayList<Node> runFordFulkersonAlgorithm(String csvName) throws Exception {
         FordFulkersonAlgorithm fordFulkersonAlgorithm = new FordFulkersonAlgorithm();
         ArrayList<Node> residualGraph = fordFulkersonAlgorithm.performFordFulkerson(csvName);
@@ -67,7 +78,10 @@ public class Main {
         return residualGraph;
     }
 
-    // returns an arraylist (shortest path) from source to sink
+    /*
+    to run the shortest path algorithm
+     returns an arraylist (shortest path) from source to sink
+     */
     static ArrayList<Integer> runShortestPathAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
         ShortestAugmentingPath shortestAugmentingPath = new ShortestAugmentingPath();
         Map<Integer, ArrayList<Integer>> Sap = shortestAugmentingPath.findShortestAugmentingPath(residualGraph, sourceNode, sinkNode);
@@ -77,6 +91,10 @@ public class Main {
         return Sap.get(sinkNode);
     }
 
+    /*
+    to run the dfs like algorithm
+     returns an arraylist (shortest path) from source to sink
+     */
     static ArrayList<Integer> runDFSLikeAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode) {
         DFSLike dfsLike = new DFSLike();
         Map<Integer, ArrayList<Integer>> dfs = dfsLike.decreasingDijkstra(residualGraph, sourceNode, sinkNode);
@@ -86,12 +104,20 @@ public class Main {
         return dfs.get(sinkNode);
     }
 
+    /*
+    to run the maximum path algorithm
+     returns an arraylist (shortest path) from source to sink
+     */
     static ArrayList<Integer> runMaximumCapacityAlgorithm(ArrayList<Node> residualGraph, int sourceNode, int sinkNode){
         MaximumCapacity maximumCapacity = new MaximumCapacity();
         ArrayList<Integer> maxCapacity = maximumCapacity.dijkstraMaxCriticalCapacity(residualGraph, sourceNode, sinkNode);
         return maxCapacity;
     }
 
+    /*
+    to run the random dijkstra algorithm
+     returns an arraylist (shortest path) from source to sink
+     */
     static ArrayList<Integer> runRandomDijkstraAlgorithm(ArrayList<Node> residualGraph, int sourceNode,  int sinkNode){
         RandomDijkstra randomDijkstra = new RandomDijkstra();
         Map<Integer, ArrayList<Integer>> randomPath = randomDijkstra.dijkstraWithRandomizedPriority(residualGraph, sourceNode, sinkNode);
@@ -103,7 +129,30 @@ public class Main {
 
 
 
+    /*
+    Method to generate random graphs on custom values
+     */
+    static void generateCustomGraphs() throws FileNotFoundException{
+        ArrayList<Node> nodes = new ArrayList<>();
+        int n = 100;
+        double r = 0.4;
+        int upperCap = 20;
+        RandomSourceSinkGraphs graphGenerator1 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator1.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/CustomGraph-1.csv");
 
+        nodes = new ArrayList<>();
+        n = 150;
+        r = 0.2;
+        upperCap = 30;
+        RandomSourceSinkGraphs graphGenerator2 = new RandomSourceSinkGraphs();
+        nodes = graphGenerator2.generateGraph(n, r, upperCap, nodes);
+        RandomSourceSinkGraphs.writeIntoCSV(r, upperCap, nodes, "Graphs/CustomGraph-2.csv");
+    }
+
+    /*
+    Method to generate graphs based on the project description
+     */
     static void generateGraphs() throws FileNotFoundException {
 //        Generating graphs based on the data given in the project description:
 //        1. n = 100, r = 0.2, upperCap = 2

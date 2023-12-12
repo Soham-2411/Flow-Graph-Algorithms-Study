@@ -1,6 +1,7 @@
 import java.util.*;
 
 /**
+ * This class calculates and returns a path with maximum critical capacity
  * @author Soham
  */
 public class MaximumCapacity {

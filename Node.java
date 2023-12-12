@@ -2,6 +2,8 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 /**
+ * This two classes are the graph data structures
+ * Node has a list of edges
  * @author Soham
  */
 

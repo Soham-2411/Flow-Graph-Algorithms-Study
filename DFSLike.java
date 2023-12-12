@@ -1,6 +1,8 @@
 import java.util.*;
 
 /**
+ * This class performs the dijkstra's algorithm with decreasing key values
+ * returns a map with all the paths for node
  * @author Soham
  */
 public class DFSLike {
